@@ -1,0 +1,52 @@
+#!/bin/zsh
+
+# --- acs (AtCoder Submit) Script ---
+# このスクリプトは、.zshrcから切り出された。
+
+# 変数定義 (必要に応じてカスタマイズ)
+ATCODER_ROOT="$(ghq root)/github.com/$(gh api user -q .login)/atcoder-workspace"
+
+echo "🧪 Running tests..."
+
+# 1. コンパイル
+g++ main.cpp
+if [ $? -ne 0 ]; then
+    echo "❌ Compilation failed."
+    return 1
+fi
+
+# 2. テスト実行
+oj t -c "./a.out"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Tests passed!"
+
+    # 3. コードをクリップボードにコピー
+    cat main.cpp | clip.exe
+    echo "📋 Code copied to clipboard!"
+
+    # 4. 提出URLを生成してブラウザで開く (wslviewを使用)
+    CONTEST_DIR=$(basename $(dirname $(pwd))) # abc380
+    TASK_DIR=$(basename $(pwd))               # a
+    TASK_ID="${CONTEST_DIR}_${TASK_DIR}"      # abc380_a
+    SUBMIT_URL="https://atcoder.jp/contests/${CONTEST_DIR}/submit?taskScreenName=${TASK_ID}"
+
+    echo "🌍 Opening submit page: $SUBMIT_URL"
+    wslview "$SUBMIT_URL"
+
+    # 5. Git記録
+    echo "🚀 Committing to Git..."
+    # ATCODER_ROOTが設定されていない場合はスキップ
+    if [ -d "$ATCODER_ROOT" ]; then
+        pushd "$ATCODER_ROOT" > /dev/null
+        git add .
+        git commit -m "Solved: ${TASK_ID} at $(date +'%Y-%m-%d %H:%M')"
+        popd > /dev/null
+        echo "💾 Git recorded."
+    else
+        echo "⚠️ ATCODER_ROOT not found. Skipping Git commit."
+    fi
+    echo "👉 Just Paste (Ctrl+V) and Submit!"
+else
+    echo "❌ Tests failed."
+fi

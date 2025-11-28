@@ -1,0 +1,20 @@
+# File: ~/dotfiles/zsh/functions/cj (または任意のパス)
+
+function cj() {
+  local project_dir
+  # ghq管理下のリポジトリ一覧を取得し、fzfで選択
+  # --preview でREADMEを表示すると中身がわかって便利
+  project_dir=$(ghq list -p | fzf --height 40% --layout=reverse --border --prompt='Project > ' \
+    --preview 'bat --color=always --style=header,grid --line-range :80 {}/README.md 2>/dev/null || ls -F {}')
+
+  if [ -n "$project_dir" ]; then
+    # 1. バッファの内容をスタックに積んでディレクトリ移動 (戻りたければ popd できる)
+    pushd "$project_dir" > /dev/null
+
+    # 2. VS Code で開く (-r: リユースウィンドウ / 新規ウィンドウがいいなら外す)
+    code -r .
+
+    # 3. 成功メッセージ（任意）
+    echo "🚀 Opened $(basename "$project_dir") in VS Code."
+  fi
+}
