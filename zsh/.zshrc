@@ -3,6 +3,10 @@ export ZSH="$HOME/.oh-my-zsh"
 export LANG=en_US.UTF-8
 export EDITOR='nvim' # vimよりnvimを推奨
 export PATH="$HOME/bin:$PATH"
+export PIP_REQUIRE_VIRTUALENV=true
+
+alias marp='pnpm exec marp --allow-local-files' # プロジェクトローカルのmarpがあればそれを、なければグローバル(もしあれば)を使うエイリアス
+alias glabel="~/src/github.com/Hyd3-14/my-toolbox/github/labels/sync-labels.sh"
 
 source "$HOME/dotfiles/zsh/functions/cj"
 
@@ -34,14 +38,19 @@ source $ZSH/oh-my-zsh.sh
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # --- 4. Project Specifics ---
-# acs関数は ~/bin/acs に移動し、ここでは削除することを強く推奨。
-# どうしても残すなら、ここより下。
-
 # 便利エイリアス
 alias win='cd ~/win'
 alias ii='explorer.exe .'
 alias open='wslview'
 alias mbuild='/home/tantan/src/github.com/Hid3-14/research-note/mbuild.sh'
+
+# pnpm
+export PNPM_HOME="/home/tantan/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
 
 # --- 5. Key Bindings ---
 # ghq-fzf

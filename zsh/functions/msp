@@ -1,0 +1,18 @@
+function msp() {
+  # エラーハンドリング: ファイル存在確認
+  if [[ ! -f "slide.md" ]]; then
+    echo "❌ Error: slide.md not found in current directory."
+    return 1
+  fi
+
+  # 成果物ディレクトリの作成 (存在しない場合のみ)
+  mkdir -p dist
+
+  echo "🚀 Building PDF..."
+  marp --pdf slide.md -o dist/slide.pdf --allow-local-files
+
+  echo "🚀 Building PPTX..."
+  marp --pptx slide.md -o dist/slide.pptx --allow-local-files
+
+  echo "✅ Done: dist/slide.pdf & dist/slide.pptx"
+}

@@ -1,3 +1,39 @@
-.zshrc.local
-.DS_Store
+# --- Secrets (最優先) ---
+# 前回の決定に基づき、ローカル専用の環境変数ファイルを除外
+zsh/env.local.zsh
 .zsecret
+
+# --- OS Generated Files (WSL2/Windows/macOS) ---
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows (WSL2からアクセスした際に生成される可能性があるため)
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --- Editor / IDE ---
+# --- VS Code ---
+# 1. 基本的に .vscode 内はすべて無視する
+.vscode/*
+
+# 2. 共有すべき重要な設定ファイルのみ "救出" (!) する
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# 3. 具体的に除外すべきファイル（念のため明記）
+.vscode/sftp.json
+*.code-workspace
+.history/
+
+# JetBrains / IntelliJ
+.idea/
+
+# --- Others ---
+# ログファイルや一時ファイル
+*.log
+*.swp
