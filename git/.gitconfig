@@ -8,10 +8,10 @@
 	helper = !/usr/bin/gh auth git-credential
 [user]
 	email = htoshi1444@gmail.com
-	name = Hid3-14
+	name = Hyd3-14
 [credential]
 	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
-	username = Hid3-14
+	username = Hyd3-14
 	useHttpPath = true
 [include]
 	path = /home/tantan/src/github.com/Hid3-14/my-toolbox/git/.gitconfig_global
