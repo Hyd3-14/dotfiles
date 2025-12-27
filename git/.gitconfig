@@ -15,3 +15,6 @@
 	useHttpPath = true
 [include]
 	path = /home/tantan/src/github.com/Hid3-14/my-toolbox/git/.gitconfig_global
+[alias]
+; cleanup: マージ済みのブランチを削除するコマンド
+    cleanup = "!git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -D"
