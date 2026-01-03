@@ -18,3 +18,5 @@
 [alias]
 ; cleanup: マージ済みのブランチを削除するコマンド
     cleanup = "!git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -D"
+[rebase]
+	autoStash = true
