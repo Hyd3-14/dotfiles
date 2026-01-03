@@ -3,6 +3,11 @@
 # - このファイルは `install.sh` から source され、
 #   `repo_root` と `HOME_DIR` が定義されていることを前提とします。
 
+# safety guard: repo_root が未定義で読み込まれた場合は何もしない（無限エラーを防ぐ）
+if [[ -z "${repo_root:-}" ]]; then
+  return 0
+fi
+
 # LINKS は associative array として populate される
 declare -g -A LINKS
 

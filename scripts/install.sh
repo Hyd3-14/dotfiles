@@ -60,17 +60,6 @@ done
 # スクリプトの位置からリポジトリのルートを推定します。
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# ライブラリとマッピングを読み込む（モジュール化）
-source "$script_dir/lib.sh"
-source "$script_dir/links.sh" || true
-
-# detect repo root using helper (lib.sh の detect_repo_root を利用)
-detect_repo_root "$script_dir"
-
-# repo_root は detect_repo_root によって設定される
-# `links.sh` は後から source しても良いが、ここでは必要に応じて再-source する
-source "$script_dir/links.sh" || true
-
 # ユーザのホーム（$HOME 環境変数を尊重）
 HOME_DIR="${HOME:-/root}"
 
@@ -82,8 +71,21 @@ backup_dir="$HOME_DIR/dotfiles_backup_$timestamp"
 XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME_DIR/.config}"
 XDG_BIN_HOME="${XDG_BIN_HOME:-$HOME_DIR/.local/bin}"
 
+# LINKS は links.sh で構築されるが、set -u 対策として先に空で宣言しておく
+declare -A LINKS=()
+
+# ライブラリを読み込む（モジュール化）
+source "$script_dir/lib.sh"
+
+# detect repo root using helper (lib.sh の detect_repo_root を利用)
+detect_repo_root "$script_dir"
+
+# repo_root は detect_repo_root によって設定されるため、
+# リンク定義をここで読み込む（links.sh は repo_root に依存する）
+source "$script_dir/links.sh" || true
+
 # links.sh によって LINKS が構築される
-if [[ ${#LINKS[@]:-0} -eq 0 ]]; then
+if [[ ${#LINKS[@]} -eq 0 ]]; then
   echo "No files found to link. Please check repository layout."
   exit 1
 fi
