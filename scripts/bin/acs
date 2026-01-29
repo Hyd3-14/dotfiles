@@ -16,7 +16,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # 2. テスト実行
-oj t -c "./a.out"
+oj t -c "./a.out" -N
 
 if [ $? -eq 0 ]; then
     echo "✅ Tests passed!"
