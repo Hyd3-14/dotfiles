@@ -1,0 +1,16 @@
+ghq-path() {
+  ghq list --full-path | fzf
+}
+
+dev() {
+  local moveto
+  moveto="$(ghq-path)"
+  [ -z "$moveto" ] && return 0
+  cd "$moveto" || return 1
+
+  if [ -n "$TMUX" ]; then
+    local repo_name
+    repo_name="${moveto##*/}"
+    tmux rename-session "${repo_name//./-}"
+  fi
+}
