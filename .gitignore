@@ -37,3 +37,8 @@ $RECYCLE.BIN/
 # ログファイルや一時ファイル
 *.log
 *.swp
+
+# secrets under config
+config/gh/hosts.yml
+config/qiita-cli/credentials.json
+config/atcoder-cli-nodejs/session.json
