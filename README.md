@@ -1,57 +1,84 @@
 # dotfiles
 
-このリポジトリは、Hyd3-14 の開発環境（シェル設定、エディタ設定、便利なスクリプトなど）を管理する dotfiles 集合です。以下にファイルの全体像と各トップレベルフォルダの簡単な説明をまとめます。
+WSL/Ubuntu を前提に、開発環境を再現するための個人用 dotfiles です。  
+新しい PC でもこのリポジトリから `install.sh` を実行すれば、主要設定を symlink で復元できます。
 
-## 全体構成（トップレベル）
+詳細セットアップは [docs/SETUP.md](docs/SETUP.md) を参照してください。
 
-- `.gitignore`
-  - リポジトリで無視するファイル／フォルダの一覧。開発や設定ファイルの一部を Git 管理対象外にします。
-- `.vscode/`
-  - Visual Studio Code 用のワークスペースや設定（settings.json, launch.json, recommended extensions 等）が入ります。エディタ固有の設定を共有するためのフォルダです。
-- `git/`
-  - Git 関連の設定やフック、テンプレートなどをまとめます（例：.gitconfig のスニペット、commit-msg フック、テンプレートディレクトリなど）。
-- `scripts/`
-  - インストール用やユーティリティ用のスクリプトを格納します。環境構築や dotfiles のシンボリックリンク作成、アップデート補助スクリプトなどが含まれる想定です。
-- `zsh/`
-  - Zsh の設定一式（.zshrc, プラグイン設定、テーマ、補助スクリプトなど）をまとめます。oh-my-zsh / zinit 等の設定もここに置くことが多いです。
+## Quick Start (New PC)
 
-> 補足: scripts/ と functions/ は、シェルの状態を変えるかどうかで使い分けることが一般的です。
->
-> - `scripts/`: 単体実行する処理。親シェルの状態は変えない
-> - `zsh/functions/`: 現在のシェルで source して使う関数。cd/export/補完などを含む
+```bash
+git clone https://github.com/Hyd3-14/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 
-## 各フォルダの簡単な説明と使い方
+# 依存ツール確認（Ubuntu/WSL向け）
+./scripts/bootstrap-ubuntu.sh
+# 必要ならインストール
+./scripts/bootstrap-ubuntu.sh --install --yes
 
-- `.vscode/`
-  - ワークスペース全体で共有したい VSCode の設定を入れておく場所です。ローカルに適用する場合は `.vscode/` をそのままプロジェクトにコピーするか、設定を VSCode に取り込んでください。
-- `git/`
-  - 個人用の Git 設定をまとめておくことで、新しいマシンでも同じコミットメッセージルールや差分ツールを再現できます。必要に応じて `~/.gitconfig` にインクルードしてください。
-- `scripts/`
-  - もし `install` や `setup` 系のスクリプトが含まれていれば、実行することで自動的に設定ファイルをホームディレクトリにリンクしたり、依存ツールをインストールできます。実行前にスクリプトの中身を必ず確認してください。
-- `zsh/`
-  - Zsh のエントリポイント（例：`~/.zshrc`）をここに置くか、ここからホームディレクトリにシンボリックリンクを張る形で使います。プラグイン管理やテーマの導入手順があれば README に追記してください。
+# まずは dry-run
+./scripts/install.sh --dry-run --yes
 
-## インストールの例（一般的な手順）
+# 問題なければ適用
+./scripts/install.sh --yes
+```
 
-1. リポジトリをクローンする
-   ```bash
-   git clone https://github.com/Hyd3-14/dotfiles.git
-   ```
-2. scripts/ にインストールスクリプトがあれば、それを確認して実行する（例: `scripts/install.sh`）
-   - 実行する前にスクリプトの中身をレビューしてください。
-3. 手動で設定を反映する場合は、必要なファイルをホームディレクトリにコピーまたはシンボリックリンクを作成する
+適用後:
 
-   例（Zsh の設定をリンクする場合）：
+- バックアップ: `~/dotfiles_backup_<timestamp>/`
+- コマンドリンク: `~/.local/bin`（PATH に含める）
 
-   ```bash
-   ln -s dotfiles/zsh/.zshrc ~/.zshrc
-   ```
+## What Gets Linked
 
-## 注意事項
+### Home
 
-- スクリプトを実行する際は内容を必ず確認のうえで行ってください（ファイルの上書き等が発生する可能性があります）。
-- 機密情報（API キーや個人情報）はこのリポジトリに含めないでください。
+- `git/.gitconfig` -> `~/.gitconfig`
+- `git/.gitignore_global` -> `~/.gitignore_global`
+- `zsh/.zshrc` -> `~/.zshrc`
+- `zsh/` -> `~/.zsh`
+- `.vscode/` -> `~/.vscode`
 
----
+### Optional Home Files (存在する場合のみ)
 
-必要であれば、実際のフォルダ内ファイル一覧を取得して README に具体例（主要ファイル名やスクリプトの使い方）を追記します。どのレベルまで詳しくまとめるか指示をください（例：「各ファイルの説明を追加」「インストール手順を自動化して README に載せる」など）。
+- `bash/.bashrc` -> `~/.bashrc`
+- `bash/.profile` -> `~/.profile`
+- `fzf/.fzf.bash` -> `~/.fzf.bash`
+- `fzf/.fzf.zsh` -> `~/.fzf.zsh`
+- `codex/config.toml` -> `~/.codex/config.toml`
+
+### ~/.config
+
+- `config/act/actrc` -> `~/.config/act/actrc`
+- `config/atcoder-cli-nodejs/config.json` -> `~/.config/atcoder-cli-nodejs/config.json`
+- `config/atcoder-cli-nodejs/cpp/main.cpp` -> `~/.config/atcoder-cli-nodejs/cpp/main.cpp`
+- `config/atcoder-cli-nodejs/cpp/template.json` -> `~/.config/atcoder-cli-nodejs/cpp/template.json`
+- `config/gh/config.yml` -> `~/.config/gh/config.yml`
+- `config/gwq/config.toml` -> `~/.config/gwq/config.toml`
+- `config/mise/config.toml` -> `~/.config/mise/config.toml`
+- `config/Code/User/mcp.json` -> `~/.config/Code/User/mcp.json`
+- `config/Code/User/settings.json` -> `~/.config/Code/User/settings.json`
+
+### scripts/bin
+
+`scripts/bin` 直下の実行ファイルを `~/.local/bin` に symlink します。
+
+## Security Policy
+
+以下は管理しない方針です（`.gitignore` で除外）:
+
+- `config/gh/hosts.yml`
+- `config/qiita-cli/credentials.json`
+- `config/atcoder-cli-nodejs/session.json`
+- `zsh/env.local.zsh`
+- `.zsecret`
+
+機密情報は必ずローカル専用ファイルに置いてください。
+
+## Update Workflow
+
+1. ローカルで設定変更
+2. dotfiles 側に反映
+3. `./scripts/install.sh --dry-run --yes` で確認
+4. コミット
+
+詳細な運用は [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) を参照。

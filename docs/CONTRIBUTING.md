@@ -18,7 +18,7 @@
 
 - 主要な設定ファイルをホームディレクトリにシンボリックリンクで配置
 - 既存の設定ファイルがある場合はバックアップ（タイムスタンプ付きディレクトリ）
-- `scripts/` 配下で実行権のあるファイルを `~/.local/bin`（既定）にシンボリックリンク
+- `scripts/bin/` 配下で実行権のあるファイルを `~/.local/bin`（既定）にシンボリックリンク
 
 重要：スクリプトはファイルの移動や上書きを伴うため、実行前に必ず内容を確認してください。
 
@@ -42,6 +42,13 @@
 - 実行（対話なし）
   ./scripts/install.sh --yes
 
+### 補助スクリプト
+
+- `scripts/bootstrap-ubuntu.sh`
+  - Ubuntu/WSL の依存コマンド確認と apt インストール補助
+- `scripts/import-home-config.sh`
+  - 現在のホーム設定から、管理対象の設定を dotfiles に取り込む
+
 ### バックアップ
 
 - 既存ファイルは `~/dotfiles_backup_<timestamp>/` に移動します。
@@ -49,12 +56,10 @@
 
 ## install.sh の拡張（ファイルの追加方法）
 
-- 現状、`scripts/install.sh` は典型的なマッピング（`git/.gitconfig` → `~/.gitconfig`、`zsh/.zshrc` → `~/.zshrc`、`zsh/` → `~/.zsh`、`.vscode/` → `~/.vscode`）を自動検出します。
-- 新しい設定ファイルを追加したら、`scripts/install.sh` の `LINKS` セクションに追記してください。例：
+- 現状、`scripts/install.sh` は `scripts/links.sh` のマッピング定義を読み込んでリンクします。
+- 新しい設定ファイルを追加したら、`scripts/links.sh` の `config_files` または `add_link` に追記してください。例：
   ```bash
-  if [[ -e "$repo_root/tmux/.tmux.conf" ]]; then
-    LINKS["$repo_root/tmux/.tmux.conf"]="$HOME_DIR/.tmux.conf"
-  fi
+  add_link "$repo_root/tmux/.tmux.conf" "$HOME_DIR/.tmux.conf"
   ```
 - 追加後は `--dry-run` で動作を確認してから実行してください。
 
