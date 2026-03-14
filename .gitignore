@@ -42,3 +42,7 @@ $RECYCLE.BIN/
 config/gh/hosts.yml
 config/qiita-cli/credentials.json
 config/atcoder-cli-nodejs/session.json
+
+# codex: 設定ファイル以外は機密/状態データなので除外
+codex/*
+!codex/config.toml
