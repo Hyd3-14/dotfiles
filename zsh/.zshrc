@@ -8,6 +8,7 @@ export PIP_REQUIRE_VIRTUALENV=true
 alias marp='pnpm exec marp --allow-local-files' # プロジェクトローカルのmarpがあればそれを、なければグローバル(もしあれば)を使うエイリアス
 alias glabel="~/src/github.com/Hyd3-14/my-toolbox/github/labels/sync-labels.sh"
 
+# functions/ 以下のスクリプトを全て source する
 for f in ~/dotfiles/zsh/functions/*; do
   [ -f "$f" ] && source "$f"
 done
