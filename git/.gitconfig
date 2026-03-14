@@ -1,20 +1,17 @@
 [ghq]
 	root = /home/tantan/ghq
-[credential "https://github.com"]
-	helper =
-	helper = !/usr/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper =
-	helper = !/usr/bin/gh auth git-credential
 [user]
 	email = htoshi1444@gmail.com
 	name = Hyd3-14
 [credential]
-	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe
-	username = Hyd3-14
+	helper =
 	useHttpPath = true
+[credential "https://github.com"]
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !gh auth git-credential
 [include]
-	path = /home/tantan/src/github.com/Hid3-14/my-toolbox/git/.gitconfig_global
+	path = ~/ghq/github.com/Hyd3-14/my-toolbox/git/.gitconfig_global
 [alias]
 ; cleanup: マージ済みのブランチを削除するコマンド
     cleanup = "!git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r git branch -D"

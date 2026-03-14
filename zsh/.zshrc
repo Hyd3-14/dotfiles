@@ -6,7 +6,10 @@ export PATH="$HOME/bin:$PATH"
 export PIP_REQUIRE_VIRTUALENV=true
 
 alias marp='pnpm exec marp --allow-local-files' # プロジェクトローカルのmarpがあればそれを、なければグローバル(もしあれば)を使うエイリアス
-alias glabel="~/src/github.com/Hyd3-14/my-toolbox/github/labels/sync-labels.sh"
+
+# GitHub 関連リポジトリのベースパス（必要ならアカウント名だけ変える）
+export GITHUB_ACCOUNT="${GITHUB_ACCOUNT:-Hyd3-14}"
+export GITHUB_SRC_ROOT="$HOME/ghq/github.com/$GITHUB_ACCOUNT"
 
 # functions/ 以下のスクリプトを全て source する
 for f in ~/dotfiles/zsh/functions/*; do
@@ -45,7 +48,6 @@ source $ZSH/oh-my-zsh.sh
 alias win='cd ~/win'
 alias ii='explorer.exe .'
 alias open='wslview'
-alias mbuild='/home/tantan/src/github.com/Hid3-14/research-note/mbuild.sh'
 
 # pnpm
 export PNPM_HOME="/home/tantan/.local/share/pnpm"
@@ -67,3 +69,21 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 bindkey '^t' ghq-fzf
+
+glabel() {
+  local script="$GITHUB_SRC_ROOT/my-toolbox/github/labels/sync-labels.sh"
+  if [ ! -x "$script" ]; then
+    echo "glabel: not found or not executable: $script"
+    return 1
+  fi
+  "$script" "$@"
+}
+
+mbuild() {
+  local script="$GITHUB_SRC_ROOT/research-note/mbuild.sh"
+  if [ ! -x "$script" ]; then
+    echo "mbuild: not found or not executable: $script"
+    return 1
+  fi
+  "$script" "$@"
+}
