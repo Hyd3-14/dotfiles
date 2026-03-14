@@ -12,7 +12,7 @@ export GITHUB_ACCOUNT="${GITHUB_ACCOUNT:-Hyd3-14}"
 export GITHUB_SRC_ROOT="$HOME/ghq/github.com/$GITHUB_ACCOUNT"
 
 # functions/ 以下のスクリプトを全て source する
-for f in ~/dotfiles/zsh/functions/*; do
+for f in "$HOME/.zsh/functions/"*; do
   [ -f "$f" ] && source "$f"
 done
 

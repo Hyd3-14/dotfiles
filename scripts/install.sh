@@ -6,7 +6,7 @@
 # - リポジトリ内の主要な dotfiles をホームディレクトリ（または XDG 相当）に
 #   シンボリックリンクとして配置します。
 # - 既存ファイルがあればタイムスタンプ付きバックアップに移動します（上書きしない）。
-# - scripts/ 配下の実行可能ファイルは ~/.local/bin にシンボリックリンクします。
+# - scripts/bin 配下の実行可能ファイルは ~/.local/bin にシンボリックリンクします。
 #
 # 使い方の例:
 #   ./scripts/install.sh --dry-run     (変更内容を表示するだけ)
@@ -36,7 +36,6 @@ Options:
   -y, --yes        : すべての確認を自動的に yes で通す
   -h, --help       : このヘルプを表示
 EOF
-  exit 1
 }
 
 # 引数解析（簡易）
@@ -45,8 +44,8 @@ while [[ $# -gt 0 ]]; do
     -n|--dry-run) DRY_RUN=1; shift ;;
     -f|--force) FORCE=1; shift ;;
     -y|--yes) ASSUME_YES=1; shift ;;
-    -h|--help) usage ;;
-    *) echo "Unknown argument: $1"; usage ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown argument: $1"; usage; exit 1 ;;
   esac
 done
 
@@ -80,15 +79,15 @@ source "$script_dir/lib.sh"
 # detect repo root using helper (lib.sh の detect_repo_root を利用)
 detect_repo_root "$script_dir"
 
-# repo_root は detect_repo_root によって設定されるため、
-# リンク定義をここで読み込む（links.sh は repo_root に依存する）
-source "$script_dir/links.sh" || true
+# repo_root は detect_repo_root によって設定されるため、ここで読み込む
+source "$script_dir/links.sh"
 
 # links.sh によって LINKS が構築される
 if [[ ${#LINKS[@]} -eq 0 ]]; then
   echo "No files found to link. Please check repository layout."
   exit 1
 fi
+mapfile -t link_sources < <(printf '%s\n' "${!LINKS[@]}" | sort)
 
 # -----------------------
 # 計画の表示と確認
@@ -97,7 +96,7 @@ echo "Repository root: $repo_root"
 echo "Backup directory will be: $backup_dir"
 echo "Planned links:"
 # realpath が使えない環境を考慮し、相対表示が不能な場合はフルパスを表示
-for src in "${!LINKS[@]}"; do
+for src in "${link_sources[@]}"; do
   src_display="$src"
   if command -v realpath >/dev/null 2>&1; then
     src_display="$(realpath --relative-to="$repo_root" "$src" 2>/dev/null || realpath "$src")"
@@ -121,49 +120,39 @@ fi
 # backup_and_link は scripts/lib.sh に実装済み
 
 # 実行: 各マッピングを処理
-for src in "${!LINKS[@]}"; do
+for src in "${link_sources[@]}"; do
   dest="${LINKS[$src]}"
   backup_and_link "$src" "$dest"
 done
 
 # -----------------------
-# scripts/ 配下の実行ファイルを ~/.local/bin にリンク
+# scripts/bin 配下の実行ファイルを ~/.local/bin にリンク
 # - 実行ビット (executable) が立っている単一ファイルを対象
 # -----------------------
-if [[ -d "$repo_root/scripts" ]]; then
-  echo "Processing scripts/ executables -> linking to $XDG_BIN_HOME"
-  # find で scripts/ 直下のファイルを走査（サブディレクトリは除外）
+if [[ -d "$repo_root/scripts/bin" ]]; then
+  echo "Processing scripts/bin executables -> linking to $XDG_BIN_HOME"
   while IFS= read -r -d '' file; do
-    # 自分自身（install.sh）をリンクしないようにガード
-    if [[ "$(basename "$file")" == "$(basename "${BASH_SOURCE[0]}")" ]]; then
-      continue
-    fi
-    # 実ファイルかつ実行権限があるファイルだけ対象
-    if [[ -f "$file" && -x "$file" ]]; then
-      target="$XDG_BIN_HOME/$(basename "$file")"
-      # 既に同じリンクが張られているかチェック（相対リンクも考慮）
-      if [[ -L "$target" ]]; then
-        target_resolved="$(canonicalize "$target")"
-        file_resolved="$(canonicalize "$file")"
-        if [[ "$target_resolved" == "$file_resolved" ]]; then
-          echo "[SKIP] $target already links to $file"
-          continue
-        fi
+    target="$XDG_BIN_HOME/$(basename "$file")"
+    if [[ -L "$target" ]]; then
+      target_resolved="$(canonicalize "$target")"
+      file_resolved="$(canonicalize "$file")"
+      if [[ "$target_resolved" == "$file_resolved" ]]; then
+        echo "[SKIP] $target already links to $file"
+        continue
       fi
-      # 既存ファイルがあればバックアップ
-      if [[ -e "$target" || -L "$target" ]]; then
-        target_backup="$backup_dir/$(basename "$target").$timestamp"
-        if [[ $DRY_RUN -eq 1 ]]; then
-          echo "[DRY-RUN] mv \"$target\" \"$target_backup\""
-        else
-          echo "[MOVE] $target -> $target_backup"
-          mv "$target" "$target_backup"
-        fi
-      fi
-      echodo ln -s "$file" "$target"
-      echo "[LINK] $target -> $file"
     fi
-  done < <(find "$repo_root/scripts" -maxdepth 1 -type f -print0 || true)
+    if [[ -e "$target" || -L "$target" ]]; then
+      target_backup="$backup_dir/$(basename "$target").$timestamp"
+      if [[ $DRY_RUN -eq 1 ]]; then
+        echo "[DRY-RUN] mv \"$target\" \"$target_backup\""
+      else
+        echo "[MOVE] $target -> $target_backup"
+        mv "$target" "$target_backup"
+      fi
+    fi
+    echodo ln -s "$file" "$target"
+    echo "[LINK] $target -> $file"
+  done < <(find "$repo_root/scripts/bin" -maxdepth 1 -type f -perm -u+x -print0 | sort -z)
 fi
 
 echo "Done."

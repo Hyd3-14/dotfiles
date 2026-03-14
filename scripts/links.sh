@@ -10,23 +10,50 @@ fi
 
 # LINKS は associative array として populate される
 declare -g -A LINKS
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME_DIR/.config}"
 
-# git/.gitconfig が存在するなら ~/.gitconfig にリンク
-if [[ -e "$repo_root/git/.gitconfig" ]]; then
-  LINKS["$repo_root/git/.gitconfig"]="$HOME_DIR/.gitconfig"
-fi
+add_link() {
+  local src="$1"
+  local dest="$2"
+  if [[ -e "$src" ]]; then
+    LINKS["$src"]="$dest"
+  fi
+}
 
-# zsh の個別ファイルとディレクトリ
-if [[ -e "$repo_root/zsh/.zshrc" ]]; then
-  LINKS["$repo_root/zsh/.zshrc"]="$HOME_DIR/.zshrc"
-fi
+# 基本 dotfiles
+add_link "$repo_root/git/.gitconfig" "$HOME_DIR/.gitconfig"
+add_link "$repo_root/git/.gitignore_global" "$HOME_DIR/.gitignore_global"
+add_link "$repo_root/zsh/.zshrc" "$HOME_DIR/.zshrc"
+
 if [[ -d "$repo_root/zsh" ]]; then
   LINKS["$repo_root/zsh"]="$HOME_DIR/.zsh"
 fi
 
-# VSCode 設定（運用によっては除外したい）
+# ホーム直下の追加設定（存在するものだけリンク）
+add_link "$repo_root/bash/.bashrc" "$HOME_DIR/.bashrc"
+add_link "$repo_root/bash/.profile" "$HOME_DIR/.profile"
+add_link "$repo_root/fzf/.fzf.bash" "$HOME_DIR/.fzf.bash"
+add_link "$repo_root/fzf/.fzf.zsh" "$HOME_DIR/.fzf.zsh"
+add_link "$repo_root/codex/config.toml" "$HOME_DIR/.codex/config.toml"
+
+# VSCode 設定
 if [[ -d "$repo_root/.vscode" ]]; then
   LINKS["$repo_root/.vscode"]="$HOME_DIR/.vscode"
 fi
 
-# 追加の候補: tmux, nvim 等はここに追記する
+# ~/.config 配下の管理対象
+config_files=(
+  "act/actrc"
+  "atcoder-cli-nodejs/config.json"
+  "atcoder-cli-nodejs/cpp/main.cpp"
+  "atcoder-cli-nodejs/cpp/template.json"
+  "gh/config.yml"
+  "gwq/config.toml"
+  "mise/config.toml"
+  "Code/User/mcp.json"
+  "Code/User/settings.json"
+)
+
+for rel in "${config_files[@]}"; do
+  add_link "$repo_root/config/$rel" "$XDG_CONFIG_HOME/$rel"
+done

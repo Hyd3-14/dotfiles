@@ -8,8 +8,10 @@ set -euo pipefail
 # - スクリプトの位置から git のルートを優先して決定し、変数 repo_root を設定する
 detect_repo_root() {
   local script_dir="$1"
+  local git_root=""
   if command -v git >/dev/null 2>&1; then
-    if git_root=$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null || true); then
+    git_root="$(git -C "$script_dir" rev-parse --show-toplevel 2>/dev/null || true)"
+    if [[ -n "$git_root" ]]; then
       repo_root="$git_root"
       return 0
     fi
@@ -66,6 +68,11 @@ prompt_confirm() {
 backup_and_link() {
   local src="$1"
   local dest="$2"
+  local dest_resolved=""
+  local src_resolved=""
+  local base=""
+  local dest_backup=""
+  local dest_parent=""
 
   src="$(cd "$(dirname "$src")" && pwd)/$(basename "$src")"
 
