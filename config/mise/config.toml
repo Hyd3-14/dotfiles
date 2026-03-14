@@ -1,0 +1,6 @@
+[tools]
+go = "latest"
+node = "lts"
+pnpm = "10.28.2"
+python = "latest"
+uv = "latest"
