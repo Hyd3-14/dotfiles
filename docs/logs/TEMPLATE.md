@@ -3,7 +3,7 @@
 ## Metadata
 
 - Date: <YYYY-MM-DD>
-- Written by: Hyd3-14 (User), Codex (GPT-5)
+- Written by: Hyd3-14 (User), Codex (GPT-5.3-Codex High)
 - Source: `git log` / `git show`
 
 ## Summary

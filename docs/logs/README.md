@@ -27,7 +27,7 @@
 
 各ログに必ず次を記載します。
 
-- `Written by: Hyd3-14 (User), Codex (GPT-5)`
+- `Written by: Hyd3-14 (User), Codex (GPT-5.3-Codex High)`
 
 ## Source of Truth
 
