@@ -8,7 +8,9 @@ export PIP_REQUIRE_VIRTUALENV=true
 alias marp='pnpm exec marp --allow-local-files' # プロジェクトローカルのmarpがあればそれを、なければグローバル(もしあれば)を使うエイリアス
 alias glabel="~/src/github.com/Hyd3-14/my-toolbox/github/labels/sync-labels.sh"
 
-source "$HOME/dotfiles/zsh/functions/cj"
+for f in ~/dotfiles/zsh/functions/*; do
+  [ -f "$f" ] && source "$f"
+done
 
 # Mise (ここが重要。ツールのパスを通す)
 eval "$(~/.local/bin/mise activate zsh)"
